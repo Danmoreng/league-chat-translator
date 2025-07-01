@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Translation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #282c34; /* Dark background */
+            color: #abb2bf; /* Light text */
+            padding: 15px;
+            border-radius: 8px;
+            overflow: auto;
+            margin: 0;
+            height: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        #settings {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #444;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        label {
+            font-size: 0.9em;
+            color: #9da5b4;
+        }
+        input[type="text"],
+        select {
+            background: #3a3f4b;
+            border: 1px solid #555;
+            color: #abb2bf;
+            padding: 5px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            outline: none;
+        }
+        input[type="text"]:focus,
+        select:focus {
+            border-color: #61afef;
+        }
+        button {
+            background: #61afef;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.2s ease;
+        }
+        button:hover {
+            background: #529cd0;
+        }
+        #translation-content {
+            flex-grow: 1;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            background: #1e2127;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #333;
+            font-size: 1.1em;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div id="settings">
+        <label for="hotkey-input">Hotkey:</label>
+        <input type="text" id="hotkey-input" placeholder="e.g., F1">
+        <label for="language-select">Target Language:</label>
+        <select id="language-select">
+            <option value="english">English</option>
+            <option value="german">German</option>
+        </select>
+        <button id="set-area-button">Set Capture Area</button>
+        <button id="capture-button">Capture Screenshot</button>
+    </div>
+    <div id="translation-content">Waiting for translation...</div>
+    <script src="./translation-renderer.js"></script>
+</body>
+</html>

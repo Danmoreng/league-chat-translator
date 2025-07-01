@@ -1,0 +1,23 @@
+{
+  "name": "gemini",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "dotenv": "^17.0.1",
+    "electron": "^37.1.0",
+    "screenshot-desktop": "^1.15.1"
+  },
+  "dependencies": {
+    "@google/genai": "^1.7.0",
+    "@google/generative-ai": "^0.24.1",
+    "electron-store": "^8.1.0",
+    "sharp": "^0.34.2"
+  }
+}
