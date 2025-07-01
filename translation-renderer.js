@@ -2,6 +2,8 @@ const hotkeyInput = document.getElementById('hotkey-input');
 const languageSelect = document.getElementById('language-select');
 const setAreaButton = document.getElementById('set-area-button');
 const captureButton = document.getElementById('capture-button');
+const geminiApiKeyInput = document.getElementById('gemini-api-key-input');
+const saveApiKeyButton = document.getElementById('save-api-key-button');
 const translationContent = document.getElementById('translation-content');
 
 window.api.onTranslationUpdate((text) => {
@@ -26,6 +28,11 @@ setAreaButton.addEventListener('click', () => {
 // Request to capture screenshot
 captureButton.addEventListener('click', () => {
     window.api.captureScreenshot();
+});
+
+saveApiKeyButton.addEventListener('click', () => {
+    window.api.saveGeminiApiKey(geminiApiKeyInput.value);
+    alert('Gemini API Key saved!');
 });
 
 // Receive initial settings from main process
