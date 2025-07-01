@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Translation</title>
+    <title>League Chat Translator</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -81,6 +81,9 @@
         </select>
         <button id="set-area-button">Set Capture Area</button>
         <button id="capture-button">Capture Screenshot</button>
+        <label for="gemini-api-key-input">Gemini API Key:</label>
+        <input type="password" id="gemini-api-key-input" placeholder="Your Gemini API Key">
+        <button id="save-api-key-button">Save API Key</button>
     </div>
     <div id="translation-content">Waiting for translation...</div>
     <script src="./translation-renderer.js"></script>

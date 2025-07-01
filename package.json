@@ -1,9 +1,27 @@
 {
-  "name": "gemini",
+  "name": "league-chat-translator",
+  "productName": "League Chat Translator",
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "build": {
+    "appId": "com.yourcompany.gemini",
+    "productName": "League Chat Translator",
+    "files": [
+      "**/*",
+      "!dist",
+      "!dist/**/*"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "artifactName": "${productName} Setup ${version}.${ext}",
+    "asarUnpack": [
+      "**/{node_modules/sharp,node_modules/screenshot-desktop}/**/*"
+    ]
   },
   "keywords": [],
   "author": "",
@@ -12,9 +30,10 @@
   "devDependencies": {
     "dotenv": "^17.0.1",
     "electron": "^37.1.0",
-    "screenshot-desktop": "^1.15.1"
+    "electron-builder": "^26.0.12"
   },
   "dependencies": {
+    "screenshot-desktop": "^1.15.1",
     "@google/genai": "^1.7.0",
     "@google/generative-ai": "^0.24.1",
     "electron-store": "^8.1.0",

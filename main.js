@@ -4,7 +4,7 @@ const Store = require('electron-store');
 const screenshot = require('screenshot-desktop');
 const { GoogleGenAI } = require('@google/genai');
 const sharp = require('sharp');
-require('dotenv').config();
+
 
 // --- CONFIGURATION ---
 const store = new Store();
@@ -12,7 +12,19 @@ let currentHotkey = store.get('hotkey', 'F1'); // Load saved hotkey or default t
 let targetLanguage = store.get('targetLanguage', 'english'); // Load saved language or default to english
 
 // --- GEMINI API SETUP ---
-const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+let genAI;
+
+function initializeGenAI() {
+    const apiKey = store.get('geminiApiKey');
+    if (apiKey) {
+        genAI = new GoogleGenAI({ apiKey });
+    } else {
+        genAI = null; // Ensure genAI is null if no API key
+    }
+}
+
+// Initialize genAI on app start
+initializeGenAI();
 
 let setupWindow;
 let tray = null;
@@ -86,6 +98,15 @@ async function captureAndTranslate() {
             .toBuffer();
 
         console.log('Sending to Gemini...');
+        if (!genAI) {
+            const errorMessage = 'Gemini API Key not set. Please go to settings and set your API key.';
+            console.error(errorMessage);
+            if (translationWindow && !translationWindow.isDestroyed()) {
+                translationWindow.webContents.send('translation-update', errorMessage);
+            }
+            return;
+        }
+
         let prompt = "You are a helpful assistant. Translate the text from this screenshot of a video game chat. Provide only the clean translation.";
         if (targetLanguage === 'german') {
             prompt = "You are a helpful assistant. Translate the text from this screenshot of a video game chat into German. Provide only the clean translation.";
@@ -122,7 +143,7 @@ app.whenReady().then(() => {
         { type: 'separator' },
         { label: 'Quit', type: 'normal', click: () => app.quit() }
     ]);
-    tray.setToolTip('In-Game Translator');
+    tray.setToolTip('League Chat Translator');
     tray.setContextMenu(contextMenu);
 
     // Create the persistent translation window
@@ -232,4 +253,10 @@ ipcMain.on('set-capture-area', () => {
 
 ipcMain.on('capture-screenshot', () => {
     captureAndTranslate();
+});
+
+ipcMain.on('save-gemini-api-key', (event, apiKey) => {
+    store.set('geminiApiKey', apiKey);
+    initializeGenAI(); // Re-initialize genAI with the new key
+    console.log('Gemini API Key saved.');
 });

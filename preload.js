@@ -10,6 +10,7 @@ contextBridge.exposeInMainWorld('api', {
     requestSettings: () => ipcRenderer.send('request-settings'),
     setCaptureArea: () => ipcRenderer.send('set-capture-area'),
     captureScreenshot: () => ipcRenderer.send('capture-screenshot'),
+    saveGeminiApiKey: (apiKey) => ipcRenderer.send('save-gemini-api-key', apiKey),
 
     // Main -> Renderer
     onLoadCoords: (callback) => ipcRenderer.on('load-coords', (event, ...args) => callback(...args)),
