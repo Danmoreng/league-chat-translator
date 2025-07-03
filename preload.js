@@ -16,5 +16,6 @@ contextBridge.exposeInMainWorld('api', {
     onLoadCoords: (callback) => ipcRenderer.on('load-coords', (event, ...args) => callback(...args)),
     onTranslationUpdate: (callback) => ipcRenderer.on('translation-update', (event, ...args) => callback(...args)),
     onDebugImage: (callback) => ipcRenderer.on('debug-image', (event, ...args) => callback(...args)),
-    onLoadSettings: (callback) => ipcRenderer.on('load-settings', (event, ...args) => callback(...args))
+    onLoadSettings: (callback) => ipcRenderer.on('load-settings', (event, ...args) => callback(...args)),
+    onLogMessage: (callback) => ipcRenderer.on('log-message', (event, ...args) => callback(...args))
 });

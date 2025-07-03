@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>League Chat Translator</title>
@@ -12,13 +12,37 @@
             border-radius: 8px;
             overflow: auto;
             margin: 0;
-            height: 100%;
+            height: 100vh;
             box-sizing: border-box;
+        }
+
+        #app-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            height: 100%;
+            gap: 15px;
+        }
+
+        #app-container.advanced-visible {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        #main-panel {
             display: flex;
             flex-direction: column;
         }
-        #settings {
-            margin-bottom: 15px;
+
+        #advanced-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        #advanced-panel.hidden {
+            display: none;
+        }
+
+        #settings, #advanced-settings {
             padding-bottom: 10px;
             border-bottom: 1px solid #444;
             display: flex;
@@ -26,11 +50,14 @@
             gap: 10px;
             align-items: center;
         }
+
         label {
             font-size: 0.9em;
             color: #9da5b4;
         }
+
         input[type="text"],
+        input[type="password"],
         select {
             background: #3a3f4b;
             border: 1px solid #555;
@@ -40,10 +67,13 @@
             font-size: 0.9em;
             outline: none;
         }
+
         input[type="text"]:focus,
+        input[type="password"]:focus,
         select:focus {
             border-color: #61afef;
         }
+
         button {
             background: #61afef;
             color: white;
@@ -54,9 +84,11 @@
             font-size: 0.9em;
             transition: background 0.2s ease;
         }
+
         button:hover {
             background: #529cd0;
         }
+
         #translation-content {
             flex-grow: 1;
             word-wrap: break-word;
@@ -67,25 +99,93 @@
             border: 1px solid #333;
             font-size: 1.1em;
             line-height: 1.4;
+            margin-bottom: 10px;
+            position: relative; /* For spinner positioning */
+        }
+
+        #log-container {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1; /* Allow container to grow */
+            min-height: 0; /* Prevent overflow issues */
+            max-height: 80vh;
+        }
+
+        #log-output {
+            flex-grow: 1;
+            background: #1e2127;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #333;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            color: #d19a66;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #61afef;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            position: relative;
+            display: none; /* Hidden by default */
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
 <body>
-    <div id="settings">
-        <label for="hotkey-input">Hotkey:</label>
-        <input type="text" id="hotkey-input" placeholder="e.g., F1">
-        <label for="language-select">Target Language:</label>
-        <select id="language-select">
-            <option value="english">English</option>
-            <option value="german">German</option>
-        </select>
-        <button id="set-area-button">Set Capture Area</button>
-        <button id="capture-button">Capture Screenshot</button>
-        <label for="gemini-api-key-input">Gemini API Key:</label>
-        <input type="password" id="gemini-api-key-input" placeholder="Your Gemini API Key">
-        <button id="save-api-key-button">Save API Key</button>
+<div id="app-container">
+    <div id="main-panel">
+        <div id="settings">
+            <div class="spinner" id="loading-spinner"></div>
+            <label for="hotkey-display">Hotkey:</label>
+            <span id="hotkey-display">F1</span>
+            <button id="capture-button">Capture Screenshot</button>
+            <button id="toggle-advanced-button">Show Advanced</button>
+        </div>
+        <div id="translation-content"></div>
     </div>
-    <div id="translation-content">Waiting for translation...</div>
-    <script src="./translation-renderer.js"></script>
+    <div id="advanced-panel" class="hidden">
+        <div id="advanced-settings">
+            <div>
+                <label for="gemini-api-key-input">Gemini API Key:</label>
+                <input type="password" id="gemini-api-key-input" placeholder="Your Gemini API Key">
+                <button id="save-api-key-button">Save API Key</button>
+            </div>
+            <div>
+                <label for="hotkey-input">Hotkey:</label>
+                <input type="text" id="hotkey-input" placeholder="e.g., F1">
+            </div>
+            <div>
+                <label for="language-select">Target Language:</label>
+                <select id="language-select">
+                    <option value="english">English</option>
+                    <option value="german">German</option>
+                </select>
+            </div>
+            <div>
+                <button id="set-area-button">Set Capture Area</button>
+            </div>
+        </div>
+        <div id="log-container">
+            <p>Logs</p>
+            <div id="log-output"></div>
+        </div>
+    </div>
+</div>
+
+<script src="./translation-renderer.js"></script>
 </body>
 </html>

@@ -1,9 +1,12 @@
-const { app, BrowserWindow, globalShortcut, ipcMain, screen, shell, Tray, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, screen, shell, Tray, Menu } = require('electron');
 const path = require('path');
 const Store = require('electron-store');
 const screenshot = require('screenshot-desktop');
 const { GoogleGenAI } = require('@google/genai');
 const sharp = require('sharp');
+const { GlobalKeyboardListener } = require('node-global-key-listener');
+
+let vkey = new GlobalKeyboardListener();
 
 
 // --- CONFIGURATION ---
@@ -65,11 +68,18 @@ function createSetupWindow() {
 }
 
 
+function log(message) {
+    console.log(message);
+    if (translationWindow && !translationWindow.isDestroyed()) {
+        translationWindow.webContents.send('log-message', message);
+    }
+}
+
 // --- CORE FUNCTION: CAPTURE AND TRANSLATE ---
 async function captureAndTranslate() {
     const rect = store.get('captureArea');
     if (!rect) {
-        console.log('Capture area not set. Please run setup first.');
+        log('Capture area not set. Please run setup first.');
         return;
     }
 
@@ -85,22 +95,22 @@ async function captureAndTranslate() {
             height: Math.round(rect.height * scaleFactor),
         };
 
-        console.log('Capturing full screen...');
+        log('Capturing full screen...');
         const fullScreenBuffer = await screenshot({
             screen: primaryDisplay.id,
             format: 'png',
         });
 
-        console.log('Cropping image to scaled rect:', scaledRect);
+        log(`Cropping image to scaled rect: { x: ${scaledRect.x}, y: ${scaledRect.y}, width: ${scaledRect.width}, height: ${scaledRect.height} }`);
         const croppedBuffer = await sharp(fullScreenBuffer)
             .extract({ left: scaledRect.x, top: scaledRect.y, width: scaledRect.width, height: scaledRect.height })
             .png()
             .toBuffer();
 
-        console.log('Sending to Gemini...');
+        log('Sending to Gemini...');
         if (!genAI) {
             const errorMessage = 'Gemini API Key not set. Please go to settings and set your API key.';
-            console.error(errorMessage);
+            log(errorMessage);
             if (translationWindow && !translationWindow.isDestroyed()) {
                 translationWindow.webContents.send('translation-update', errorMessage);
             }
@@ -119,14 +129,14 @@ async function captureAndTranslate() {
             contents: [{ text: prompt }, { inlineData: { data: croppedBuffer.toString('base64'), mimeType: 'image/png' } }]
         });
         const translation = result.candidates[0].content.parts[0].text;
-        console.log('Translation received:', translation);
+        log(`Translation received: ${translation}`);
         
         if (translationWindow && !translationWindow.isDestroyed()) {
             translationWindow.webContents.send('translation-update', translation);
         }
 
     } catch (error) {
-        console.error('Error during capture or translation:', error);
+        log(`Error during capture or translation: ${error}`);
         if (translationWindow && !translationWindow.isDestroyed()) {
             translationWindow.webContents.send('translation-update', `Error: ${error.message}`);
         }
@@ -177,16 +187,20 @@ app.whenReady().then(() => {
     });
 
     // Register the global hotkey
-    if (!globalShortcut.register(currentHotkey, captureAndTranslate)) {
-        console.error(`Failed to register hotkey: ${currentHotkey}`);
-    }
-    console.log(`Hotkey ${currentHotkey} registered. Press it to translate the selected area.`);
+    vkey.addListener(function (e, down) {
+        // Check if the pressed key is the configured hotkey
+        if (e.state == "DOWN" && e.name == currentHotkey) {
+            captureAndTranslate();
+        }
+    });
+
+    log(`Hotkey ${currentHotkey} registered. Press it to translate the selected area.`);
 
     const primaryDisplay = screen.getPrimaryDisplay();
-    console.log('Primary Display Info:');
-    console.log('  Bounds (physical pixels): ', primaryDisplay.bounds);
-    console.log('  Work Area (logical pixels): ', primaryDisplay.workArea);
-    console.log('  Scale Factor (devicePixelRatio): ', primaryDisplay.scaleFactor);
+    log('Primary Display Info:');
+    log(`  Bounds (physical pixels):  { x: ${primaryDisplay.bounds.x}, y: ${primaryDisplay.bounds.y}, width: ${primaryDisplay.bounds.width}, height: ${primaryDisplay.bounds.height} }`);
+    log(`  Work Area (logical pixels):  { x: ${primaryDisplay.workArea.x}, y: ${primaryDisplay.workArea.y}, width: ${primaryDisplay.workArea.width}, height: ${primaryDisplay.workArea.height} }`);
+    log(`  Scale Factor (devicePixelRatio):  ${primaryDisplay.scaleFactor}`);
 
     // Send initial settings to the translation window
     if (translationWindow && !translationWindow.isDestroyed()) {
@@ -196,7 +210,7 @@ app.whenReady().then(() => {
 
 app.on('will-quit', () => {
     // Unregister the hotkey when the app is about to close
-    globalShortcut.unregisterAll();
+    vkey.kill();
 });
 
 // Hide the app from the dock (macOS specific)
@@ -205,7 +219,7 @@ app.dock?.hide();
 // --- IPC HANDLERS (Communication from UI) ---
 ipcMain.on('save-coords', (event, coords) => {
     store.set('captureArea', coords);
-    console.log('Capture area saved:', coords);
+    log(`Capture area saved: { x: ${coords.x}, y: ${coords.y}, width: ${coords.width}, height: ${coords.height} }`);
     if (setupWindow && !setupWindow.isDestroyed()) {
         setupWindow.close();
     }
@@ -224,21 +238,15 @@ ipcMain.on('close-setup', () => {
 });
 
 ipcMain.on('save-hotkey', (event, newHotkey) => {
-    if (globalShortcut.isRegistered(currentHotkey)) {
-        globalShortcut.unregister(currentHotkey);
-    }
     currentHotkey = newHotkey;
     store.set('hotkey', currentHotkey);
-    if (!globalShortcut.register(currentHotkey, captureAndTranslate)) {
-        console.error(`Failed to register new hotkey: ${currentHotkey}`);
-    }
-    console.log(`New hotkey registered: ${currentHotkey}`);
+    log(`New hotkey registered: ${currentHotkey}`);
 });
 
 ipcMain.on('save-language', (event, newLanguage) => {
     targetLanguage = newLanguage;
     store.set('targetLanguage', targetLanguage);
-    console.log(`Target language set to: ${targetLanguage}`);
+    log(`Target language set to: ${targetLanguage}`);
 });
 
 ipcMain.on('request-settings', (event) => {
@@ -258,5 +266,5 @@ ipcMain.on('capture-screenshot', () => {
 ipcMain.on('save-gemini-api-key', (event, apiKey) => {
     store.set('geminiApiKey', apiKey);
     initializeGenAI(); // Re-initialize genAI with the new key
-    console.log('Gemini API Key saved.');
+    log('Gemini API Key saved.');
 });
