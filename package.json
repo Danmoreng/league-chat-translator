@@ -1,7 +1,7 @@
 {
   "name": "league-chat-translator",
   "productName": "League Chat Translator",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A desktop app to translate in-game chat using screenshots and the Gemini API.",
   "main": "main.js",
   "repository": {
