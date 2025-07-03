@@ -41,10 +41,12 @@
     "electron-builder": "^26.0.12"
   },
   "dependencies": {
-    "screenshot-desktop": "^1.15.1",
     "@google/genai": "^1.7.0",
     "@google/generative-ai": "^0.24.1",
+    "@jitsi/robotjs": "^0.6.16",
     "electron-store": "^8.1.0",
+    "node-global-key-listener": "^0.3.0",
+    "screenshot-desktop": "^1.15.1",
     "sharp": "^0.34.2"
   }
 }
