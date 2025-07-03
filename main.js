@@ -44,6 +44,7 @@ function createSetupWindow() {
         height: primaryDisplay.workAreaSize.height,
         frame: false,
         transparent: true,
+        icon: path.join(__dirname, 'icon.png'),
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true,
@@ -163,6 +164,7 @@ app.whenReady().then(() => {
         height: savedBounds ? savedBounds.height : 400,
         x: savedBounds ? savedBounds.x : screen.getPrimaryDisplay().workAreaSize.width - 615, // Near top-right
         y: savedBounds ? savedBounds.y : 15,
+        icon: path.join(__dirname, 'icon.png'),
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true,
