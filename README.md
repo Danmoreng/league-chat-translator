@@ -2,6 +2,10 @@
 
 This is a Windows desktop application built with Electron that allows you to translate in-game chat from League of Legends (or any other game/application) in real-time. It works by taking a screenshot of a pre-defined area of your screen, sending it to the Google Gemini API for translation, and displaying the result in a separate window.
 
+## Download
+
+You can download the latest release of the application from the [GitHub Releases page](https://github.com/Danmoreng/league-chat-translator/releases).
+
 ## Features
 
 *   **Custom Capture Area:** Select the exact portion of your screen where the chat appears.
