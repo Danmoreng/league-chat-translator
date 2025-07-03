@@ -2,13 +2,18 @@
   "name": "league-chat-translator",
   "productName": "League Chat Translator",
   "version": "1.0.0",
+  "description": "A desktop app to translate in-game chat using screenshots and the Gemini API.",
   "main": "main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Danmoreng/league-chat-translator"
+  },
   "scripts": {
     "start": "electron .",
     "build": "electron-builder"
   },
   "build": {
-    "appId": "com.yourcompany.gemini",
+    "appId": "com.danmoreng.leaguechattranslator",
     "productName": "League Chat Translator",
     "files": [
       "**/*",
@@ -19,6 +24,9 @@
       "output": "dist"
     },
     "artifactName": "${productName} Setup ${version}.${ext}",
+    "publish": {
+      "provider": "github"
+    },
     "asarUnpack": [
       "**/{node_modules/sharp,node_modules/screenshot-desktop}/**/*"
     ]
@@ -26,7 +34,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "devDependencies": {
     "dotenv": "^17.0.1",
     "electron": "^37.1.0",
