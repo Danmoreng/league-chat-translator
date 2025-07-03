@@ -10,7 +10,8 @@
   },
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder"
+    "build": "electron-builder",
+    "publish": "node -r dotenv/config ./node_modules/electron-builder/out/cli/cli.js --publish always"
   },
   "build": {
     "appId": "com.danmoreng.leaguechattranslator",
