@@ -11,7 +11,7 @@ let vkey = new GlobalKeyboardListener();
 
 // --- CONFIGURATION ---
 const store = new Store();
-let currentHotkey = store.get('hotkey', 'F1'); // Load saved hotkey or default to F1
+let currentHotkey = store.get('hotkey', 'T'); // Load saved hotkey or default to T
 let targetLanguage = store.get('targetLanguage', 'english'); // Load saved language or default to english
 
 // --- GEMINI API SETUP ---
