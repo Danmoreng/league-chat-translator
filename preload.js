@@ -11,10 +11,12 @@ contextBridge.exposeInMainWorld('api', {
     setCaptureArea: () => ipcRenderer.send('set-capture-area'),
     captureScreenshot: () => ipcRenderer.send('capture-screenshot'),
     saveGeminiApiKey: (apiKey) => ipcRenderer.send('save-gemini-api-key', apiKey),
+    getGeminiApiKey: () => ipcRenderer.invoke('get-gemini-api-key'),
 
     // Main -> Renderer
     onLoadCoords: (callback) => ipcRenderer.on('load-coords', (event, ...args) => callback(...args)),
     onTranslationUpdate: (callback) => ipcRenderer.on('translation-update', (event, ...args) => callback(...args)),
+    onTranslationStarted: (callback) => ipcRenderer.on('translation-started', (event, ...args) => callback(...args)),
     onDebugImage: (callback) => ipcRenderer.on('debug-image', (event, ...args) => callback(...args)),
     onLoadSettings: (callback) => ipcRenderer.on('load-settings', (event, ...args) => callback(...args)),
     onLogMessage: (callback) => ipcRenderer.on('log-message', (event, ...args) => callback(...args))

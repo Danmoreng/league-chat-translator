@@ -19,6 +19,11 @@ toggleAdvancedButton.addEventListener('click', () => {
     toggleAdvancedButton.textContent = advancedPanel.classList.contains('hidden') ? 'Show Advanced' : 'Hide Advanced';
 });
 
+window.api.onTranslationStarted(() => {
+    translationContent.innerText = '';
+    loadingSpinner.style.display = 'block';
+});
+
 window.api.onTranslationUpdate((text) => {
     translationContent.innerText = text;
     loadingSpinner.style.display = 'none';
@@ -49,8 +54,6 @@ setAreaButton.addEventListener('click', () => {
 
 // Request to capture screenshot
 captureButton.addEventListener('click', () => {
-    translationContent.innerText = '';
-    loadingSpinner.style.display = 'block';
     window.api.captureScreenshot();
 });
 
@@ -70,7 +73,11 @@ window.api.onLoadSettings((settings) => {
     }
 });
 
-// Request initial settings when the renderer is ready
-window.addEventListener('DOMContentLoaded', () => {
+// Request initial settings and API key when the renderer is ready
+window.addEventListener('DOMContentLoaded', async () => {
     window.api.requestSettings();
+    const savedApiKey = await window.api.getGeminiApiKey();
+    if (savedApiKey) {
+        geminiApiKeyInput.value = savedApiKey;
+    }
 });

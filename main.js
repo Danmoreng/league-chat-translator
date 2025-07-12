@@ -78,6 +78,11 @@ function log(message) {
 
 // --- CORE FUNCTION: CAPTURE AND TRANSLATE ---
 async function captureAndTranslate() {
+    // Notify the renderer to show the loading state
+    if (translationWindow && !translationWindow.isDestroyed()) {
+        translationWindow.webContents.send('translation-started');
+    }
+
     const rect = store.get('captureArea');
     if (!rect) {
         log('Capture area not set. Please run setup first.');
@@ -118,12 +123,8 @@ async function captureAndTranslate() {
             return;
         }
 
-        let prompt = "You are a helpful assistant. Translate the text from this screenshot of a video game chat. Provide only the clean translation.";
-        if (targetLanguage === 'german') {
-            prompt = "You are a helpful assistant. Translate the text from this screenshot of a video game chat into German. Provide only the clean translation.";
-        } else if (targetLanguage === 'english') {
-            prompt = "You are a helpful assistant. Translate the text from this screenshot of a video game chat into English. Provide only the clean translation.";
-        }
+        const languageName = targetLanguage.charAt(0).toUpperCase() + targetLanguage.slice(1); // Capitalize language name
+        const prompt = `Your task is to translate text from a screenshot of a League of Legends in-game chat. The target language is ${languageName}. Provide only the clean, translated text, and nothing else.`;
 
         const result = await genAI.models.generateContent({
             model: "gemini-2.5-flash-lite-preview-06-17",
@@ -269,4 +270,8 @@ ipcMain.on('save-gemini-api-key', (event, apiKey) => {
     store.set('geminiApiKey', apiKey);
     initializeGenAI(); // Re-initialize genAI with the new key
     log('Gemini API Key saved.');
+});
+
+ipcMain.handle('get-gemini-api-key', async () => {
+    return store.get('geminiApiKey');
 });
